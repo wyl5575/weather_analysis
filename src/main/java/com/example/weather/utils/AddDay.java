@@ -6,7 +6,12 @@ import java.util.Calendar;
 import java.util.Date;
 
 public class AddDay {
-
+    /**
+     * 工具 当前日期的 以及后几天
+     * @param date
+     * @param day
+     * @return
+     */
     public static Date addOneDay(Date date, int day) {
         SimpleDateFormat sf = new SimpleDateFormat("yyyy-MM-dd");
         Date timeNow = null;

@@ -24,62 +24,47 @@ public class CityController {
     @Autowired
     private CityService cityService;
 
+    /**
+     * 查找所有的城市 返回list
+     * @return
+     */
     @RequestMapping("/list")
     public R listInfoCity(){
         List<CityEntity> listCity = cityService.queryList();
         return R.ok().put("list",listCity);
     }
 
+    /**通过爬虫获取 所选城市的 气温
+     * @param listCity
+     * @return
+     */
     @RequestMapping("/list/temperature")
     public R listInfoTemperature(@RequestBody List<CityEntity> listCity){
         List<CityTemperature> list = cityService.temperatureList(listCity);
         return R.ok().put("list",list);
     }
 
+    /**
+     * 增加一个城市
+     * @param city
+     * @return
+     */
     @RequestMapping("/add/{city}")
     public R addCity(@PathVariable("city") String city){
         cityService.addCity(city);
         return R.ok();
     }
 
+    /**
+     * 删除一个城市
+     * @param city
+     * @return
+     */
     @RequestMapping("/delete/{city}")
     public R deleteCity(@PathVariable("city") String city){
         cityService.deleteCity(city);
         return R.ok();
     }
-
-    /**
-     * 列表
-     */
-//    @RequestMapping("/list")
-//    public R list(@RequestParam Map<String, Object> params){
-//        PageUtils page = cityService.queryPage(params);
-//        return R.ok().put("page", page);
-//    }
-//
-//
-//    /**
-//     * 信息
-//     */
-//    @RequestMapping("/info/{id}")
-//    //@RequiresPermissions("ware:city:info")
-//    public R info(@PathVariable("id") Long id){
-//		CityEntity city = cityService.getById(id);
-//
-//        return R.ok().put("city", city);
-//    }
-//
-//    /**
-//     * 保存
-//     */
-//    @RequestMapping("/save")
-//    //@RequiresPermissions("ware:city:save")
-//    public R save(@RequestBody CityEntity city){
-//		cityService.save(city);
-//        return R.ok();
-//    }
-
-
 
 
 }

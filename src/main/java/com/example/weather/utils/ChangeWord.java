@@ -6,6 +6,11 @@ import net.sourceforge.pinyin4j.format.HanyuPinyinOutputFormat;
 import net.sourceforge.pinyin4j.format.HanyuPinyinToneType;
 
 public class ChangeWord {
+    /**
+     * 中文转拼音
+     * @param chinese
+     * @return
+     */
     public static String toPinyin(String chinese) {
         StringBuilder pinyinStr = new StringBuilder();
         // 创建拼音输出格式：小写、无需音调

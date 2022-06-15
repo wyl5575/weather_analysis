@@ -33,47 +33,26 @@ public class WeatherController {
     /**
      * 查询
      */
+    /**
+     * 查询某地几天 的 温度数据
+     * @param address 地点
+     * @param day  几天内的温度
+     * @return
+     */
     @RequestMapping("/info/{address}/{day}")
     public R list(@PathVariable("address") String address, @PathVariable("day") int day){
         List<WeatherEntity> list = weatherService.selectList(address, Dateformat.dateformat(new Date()), day);
         return R.ok().put("list", list);
     }
 
+    /**
+     * @param address 某地进行爬虫
+     * @return
+     */
     @RequestMapping("/search/{address}")
     public R search(@PathVariable("address") String address){
         weatherService.search(address);
         return R.ok().put("data", "ok");
     }
-
-    @RequestMapping("/hello")
-    public R kkkk(){
-        return R.ok().put("data", 55);
-    }
-
-    /**
-     * 列表
-     */
-//    @RequestMapping("/list")
-//    //@RequiresPermissions("ware:weather:list")
-//    public R list(@RequestParam Map<String, Object> params){
-//        PageUtils page = weatherService.queryPage(params);
-//        return R.ok().put("page", page);
-//    }
-
-
-
-
-//
-//    /**
-//     * 修改
-//     */
-//    @RequestMapping("/update")
-//    //@RequiresPermissions("ware:weather:update")
-//    public R update(@RequestBody WeatherEntity weather){
-//		weatherService.updateById(weather);
-//
-//        return R.ok();
-//    }
-//
 
 }

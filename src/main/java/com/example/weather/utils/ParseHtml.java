@@ -53,12 +53,8 @@ public class ParseHtml {
         }
         Elements weatherInfo = document.getElementsByClass("weather_info");
         String text = weatherInfo.select("p").select("b").text();
-//        System.out.println(text);
         return text;
     }
 
-    public static void main(String[] args) throws Exception{
-        System.out.println(parseHtmlToday("da"));
-    }
 
 }

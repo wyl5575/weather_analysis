@@ -6,6 +6,11 @@ import java.util.Date;
 
 public class Dateformat {
 
+    /**
+     * 日期格式 去掉 时分秒
+     * @param date
+     * @return
+     */
     public static Date  dateformat(Date date){
         Date parse = null;
         try {
@@ -17,6 +22,11 @@ public class Dateformat {
         return parse;
     }
 
+    /**
+     * 日期变为字符串
+     * @param date
+     * @return
+     */
     public static String dateToString(Date date){
         SimpleDateFormat sf = new SimpleDateFormat("yyyy-MM-dd");
         String str = sf.format(date);

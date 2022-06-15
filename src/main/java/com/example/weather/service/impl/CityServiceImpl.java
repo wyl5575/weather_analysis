@@ -23,7 +23,11 @@ public class CityServiceImpl extends ServiceImpl<CityMapper, CityEntity> impleme
         return this.list(new QueryWrapper<>());
     }
 
-
+    /**
+     * 要查找的实时数据
+     * @param listCity 城市集合
+     * @return
+     */
     @Override
     public List<CityTemperature> temperatureList(List<CityEntity> listCity) {
         List<CityTemperature> listResult = new ArrayList<>();
@@ -36,7 +40,10 @@ public class CityServiceImpl extends ServiceImpl<CityMapper, CityEntity> impleme
         return listResult;
     }
 
-
+    /**
+     * 增加一个城市
+     * @param city 传入城市名字
+     */
     @Override
     public void addCity(String city) {
         QueryWrapper<CityEntity> wrapper = new QueryWrapper<>();
@@ -50,6 +57,10 @@ public class CityServiceImpl extends ServiceImpl<CityMapper, CityEntity> impleme
         this.baseMapper.insert(cityEntity);
     }
 
+    /**
+     * 删除一个城市
+     * @param city 城市名字
+     */
     @Override
     public void deleteCity(String city) {
         QueryWrapper<CityEntity> wrapper = new QueryWrapper<>();

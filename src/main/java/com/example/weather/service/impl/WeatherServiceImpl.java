@@ -51,7 +51,13 @@ public class WeatherServiceImpl extends ServiceImpl<WeatherMapper, WeatherEntity
 
     }
 
-    /**查找数据*/
+    /**查找数据 根据地点和最近一天的数据*/
+    /**
+     * @param address 传入地址
+     * @param date   传入的是今天的日期
+     * @param day     查找几天的数据
+     * @return
+     */
     @Override
     public List<WeatherEntity> selectList(String address,Date date, int day) {
         QueryWrapper<WeatherEntity> wrapper = new QueryWrapper<>();
@@ -64,11 +70,10 @@ public class WeatherServiceImpl extends ServiceImpl<WeatherMapper, WeatherEntity
         return list;
     }
 
+    /** 默认爬30天的数据可以修改 7 10 15 30 40 等数据*/
     @Override
     public void search(String address) {
         List list = ParseHtml.parseHtml(address, 30);
-//        list.forEach(System.out::println);
-//        System.out.println("+++++");
         insertOrUpdateData(address,list);
     }
 }
