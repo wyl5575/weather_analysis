@@ -11,7 +11,7 @@ spring:
   # mysql数据库连接
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: ${usrl}
+    url: ${url}
     username: ${username}
     password: ${password}
   #返回的时间格式
