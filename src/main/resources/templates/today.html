@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://cdn.bootcss.com/jquery/3.5.1/jquery.js"></script>
+    <script src="https://cdn.bootcss.com/echarts/5.3.3/echarts.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/layui/2.6.13/layui.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/layui/2.6.13/css/layui.min.css"/>
+
+</head>
+<body>
+<script type="text/html" id="barDemo">
+    <a class="layui-btn layui-btn-xs" lay-event="edit" style="width: 40px">修改</i></a>
+    <a class="layui-btn layui-btn-xs" lay-event="delete" style="width: 40px">删除</a>
+</script>
+<script type="text/html" id="toolbarDemo">
+    <div class="layui-btn-container">
+        <button class="layui-btn layui-btn-sm" lay-event="add">添加</button>
+        <button class="layui-btn layui-btn-sm" lay-event="query">查询</button>
+        <button class="layui-btn layui-btn-sm" ><a href="/">返回</a></button>
+    </div>
+</script>
+
+<div class="layui-fluid">
+    <div class="layui-row">
+        <div class="layui-col-md3">
+            <table id="demo" lay-filter="test"></table>
+        </div>
+        <div class="layui-col-md9">
+            <div id = "main" style="width: 98%;height: 680px"> </div>
+        </div>
+    </div>
+</div>
+<script>
+    let dataList = []
+    layui.use('table', function(){
+        //得到各种内置组件
+        var layer = layui.layer, //弹层
+        laypage = layui.laypage,//分页
+        element = layui.element //元素操作
+
+        var table = layui.table;
+        //第一个实例
+        table.render({
+            elem: '#demo',
+            height: 690,
+            id: 'idKey',
+            toolbar: '#toolbarDemo',
+            defaultToolbar: [],
+            url: '/city/list',
+            page: false, //开启分页
+            parseData: function(res){ //res 即为原始返回的数据
+                return {
+                    "code": res.code, //解析接口状态
+                    "msg": res.msg, //解析提示文本"count": res.total, //解析数据长度
+                    "data": res.list //解析数据列表
+                };
+            },
+            cols: [
+                [  //表头
+                    {type: 'checkbox', fixed: 'left'},
+                    {field: 'id', title: 'ID', width:60, sort: true, fixed: 'left'},
+                    {field: 'cityName', title: '城市名', width:120},
+                    {fixed: 'right', width: 143, align:'center', toolbar: '#barDemo'}
+                ]
+            ]
+        });
+
+
+
+        //监听头工具栏事件
+        table.on('toolbar(test)', function(obj){
+            let datas = table.checkStatus('idKey').data;
+            switch(obj.event){
+                case 'add':
+                    layer.prompt(function(value, index, elem){
+                        formType: 0;
+                        addCity(value) //得到value
+                        layer.close(index);
+                    });
+                    break;
+                case 'query':
+                    for (let i = 0; i < datas.length; i++) {
+                        dataList.push(datas[i])
+                    }
+                    //console.log(dataList)
+                    search()
+                    break;
+            };
+        });
+
+
+        //监听行工具事件
+        table.on('tool(test)', function(obj){ //注：tool 是工具条事件名，test 是 table 原始容器的属性 lay-filter="对应的值"
+                var data = obj.data, //获得当前行数据
+                    layEvent = obj.event; //获得 lay-event 对应的值
+                if(layEvent === 'delete'){
+                    $.ajax({
+                        asycn : true,
+                        contentType : "application/json",
+                        dataType : "json",
+                        error : function() {
+                            // 出现错误
+                            alert("请求错误");
+                        },
+                        success : function(result) {
+                            window.location.reload(true)
+                            // console.log(result)
+                        },
+                        url : "/city/delete/"+ data.cityName,
+                        type : "post"
+                    })
+                }
+            }
+        );
+    });
+
+
+    function addCity(value) {
+        $.ajax({
+            asycn : true,
+            contentType : "application/json",
+            dataType : "json",
+            data : JSON.stringify(dataList),
+            error : function() {
+                // 出现错误
+                alert("请求错误");
+            },
+            success : function(result) {
+                window.location.reload(true)
+                // console.log(result)
+            },
+            url : "/city/add/"+ value,
+            type : "post"
+        })
+    }
+
+
+    var chartDom = document.getElementById('main');
+    var myChart = echarts.init(chartDom, 'dark');
+    var option;
+
+    option = {
+        dataset: [
+            {
+                dimensions: ['name', 'age', 'profession', 'score', 'date'],
+                source: [
+                    ['Hannah Krause', 41, 'Engineer', 314, '2011-02-12'],
+                    ['Zhao Qian', 20, 'Teacher', 351, '2011-03-01'],
+                    ['Jasmin Krause ', 52, 'Musician', 287, '2011-02-14'],
+                    ['Li Lei', 37, 'Teacher', 219, '2011-02-18'],
+                    ['Karle Neumann', 25, 'Engineer', 253, '2011-04-02'],
+                    ['Adrian Groß', 19, 'Teacher', '-', '2011-01-16'],
+                    ['Mia Neumann', 71, 'Engineer', 165, '2011-03-19'],
+                    ['Böhm Fuchs', 36, 'Musician', 318, '2011-02-24'],
+                    ['Han Meimei', 67, 'Engineer', 366, '2011-03-12']
+                ]
+            },
+            {
+                transform: {
+                    type: 'sort',
+                    config: { dimension: 'score', order: 'desc' }
+                }
+            }
+        ],
+        xAxis: {
+            type: 'category',
+            axisLabel: { interval: 0, rotate: 30 }
+        },
+        yAxis: {},
+        series: {
+            type: 'bar',
+            encode: { x: 'name', y: 'score' },
+            datasetIndex: 1
+        }
+    };
+    option && myChart.setOption(option);
+
+    let xdata = [];
+
+    function search() {
+        $.ajax({
+            asycn : true,
+            contentType : "application/json",
+            dataType : "json",
+            data : JSON.stringify(dataList),
+            error : function() {
+                // 出现错误
+                dataList = []
+                alert("请求错误");
+            },
+            success : function(result) {
+                // data 就是responseText返回的数据,但是这里是jQuery处理完成之后的数据
+                dataList = []
+                let list = result.list;
+                let sum=0
+                for (let i = 0;i < list.length;sum++,i++){
+                    console.log(list[i])
+                    xdata.push(list[i])
+                }
+                myChart.setOption({
+                    dataset: [
+                        {
+                            dimensions: ['city', 'temperature'],
+                            source: xdata
+                        },
+                        {
+                            transform: {
+                                type: 'sort',
+                                config: { dimension: 'temperature', order: 'desc' }
+                            }
+                        }
+                    ],
+                    series: {
+                        type: 'bar',
+                        encode: { x: 'city', y: 'temperature' },
+                        datasetIndex: 1
+                    }
+                })
+                // console.log(result)
+            },
+            url : "/city/list/temperature",
+            type : "post"
+        })
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://cdn.bootcss.com/jquery/3.5.1/jquery.js"></script>
+    <script src="https://cdn.bootcss.com/echarts/5.3.3/echarts.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/layui/2.6.13/layui.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/layui/2.6.13/css/layui.min.css"/>
+
+</head>
+<body >
+<div style="width: 100%;height: 52px">
+    <div class="layui-form-item">
+        <div class="layui-inline">
+            <label class="layui-form-label">城市</label>
+            <div class="layui-input-inline" style="width: 100px;">
+                <input id="in1" type="text" name="price_min" placeholder="太原" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+
+        <div class="layui-inline layui-form">
+            <select id="in2" name="city" lay-verify="">
+                <option value="">请选择一个天数</option>
+                <option value="07">7</option>
+                <option value="10">10</option>
+                <option value="15">15</option>
+                <option value="40">40</option>
+            </select>
+        </div>
+        <button id="btn1" type="button" class="layui-btn">查找按钮</button>
+
+        <div class="layui-inline layui-form" style="margin-right:50px">
+            <label class="layui-form-label" style="margin-right: 50px;margin-left: 190px;">选择一个城市进行查找</label>
+            <div class="layui-input-inline" style="width: 100px;">
+                <input id="in3" style="margin-top: 10px" type="text" name="price_min" placeholder="太原" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <button id="btn2" type="button" class="layui-btn layui-btn-normal">查找</button>
+
+        <a href="/start/today" class="layui-btn" style="margin-left: 95px">跳转页面</a>
+    </div>
+</div>
+<div id = "main" style="width: 100%;height: 660px"> </div>
+<script>
+    var chartDom = document.getElementById('main');
+    var myChart = echarts.init(chartDom, 'dark');
+    var option;
+
+    option = {
+        title: {
+            text: '温度变化'
+        },
+        tooltip: {
+            trigger: 'axis'
+        },
+        legend: {},
+        toolbox: {
+            show: true,
+            feature: {
+                dataZoom: {
+                    yAxisIndex: 'none'
+                },
+                dataView: { readOnly: false },
+                magicType: { type: ['line', 'bar'] },
+                restore: {},
+                saveAsImage: {}
+            }
+        },
+        xAxis: {
+            type: 'category',
+            boundaryGap: false,
+            data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+        },
+        yAxis: {
+            type: 'value',
+            axisLabel: {
+                formatter: '{value} °C'
+            }
+        },
+        series: [
+            {
+                name: '最高温度',
+                type: 'line',
+                data: [10, 11, 13, 11, 12, 12, 9],
+                markPoint: {
+                    data: [
+                        { type: 'max', name: 'Max' },
+                        { type: 'min', name: 'Min' }
+                    ]
+                },
+                markLine: {
+                    data: [{ type: 'average', name: 'Avg' }]
+                }
+            },
+            {
+                name: '最低温度',
+                type: 'line',
+                data: [1, -2, 2, 5, 3, 2, 0],
+                markPoint: {
+                    data: [{ name: '周最低', value: -2, xAxis: 1, yAxis: -1.5 }]
+                },
+                markLine: {
+                    data: [
+                        { type: 'average', name: 'Avg' },
+                        [
+                            {
+                                symbol: 'none',
+                                x: '90%',
+                                yAxis: 'max'
+                            },
+                            {
+                                symbol: 'circle',
+                                label: {
+                                    position: 'start',
+                                    formatter: 'Max'
+                                },
+                                type: 'max',
+                                name: '最高点'
+                            }
+                        ]
+                    ]
+                }
+            }
+        ]
+    };
+    option && myChart.setOption(option);
+
+
+    var xdata = [];
+    var minData = [];
+    var maxData = [];
+    $.ajax({
+        asycn : true,
+        contentType : "application/json",
+        dataType : "json",
+        error : function() {
+            // 出现错误
+            alert("请求错误");
+        },
+        success : function(result) {
+            // data 就是responseText返回的数据,但是这里是jQuery处理完成之后的数据
+            let list = result.list;
+            let sum=0
+            for (let i = 0;i < list.length;sum++,i++){
+                xdata.push(list[i].dateTime)
+                minData.push(list[i].min)
+                maxData.push(list[i].max)
+            }
+            myChart.setOption({ //加载数据图表
+                title: {
+                    text: list[0].address + sum +'日温度变化'
+                },
+                xAxis: {
+                    type: 'category',
+                    boundaryGap: false,
+                    data: xdata
+                },
+                series: [
+                    {
+                        name: '最高温度',
+                        type: 'line',
+                        data: maxData,
+                        markPoint: {
+                            data: [
+                                { type: 'max', name: 'Max' },
+                                { type: 'min', name: 'Min' }
+                            ]
+                        },
+                        markLine: {
+                            data: [{ type: 'average', name: 'Avg' }]
+                        }
+                    },
+                    {
+                        name: '最低温度',
+                        type: 'line',
+                        data: minData,
+                        markPoint: {
+                            data: [{ name: '周最低', value: -2, xAxis: 1, yAxis: -1.5 }]
+                        },
+                        markLine: {
+                            data: [
+                                { type: 'average', name: 'Avg' },
+                                [
+                                    {
+                                        symbol: 'none',
+                                        x: '90%',
+                                        yAxis: 'max'
+                                    },
+                                    {
+                                        symbol: 'circle',
+                                        label: {
+                                            position: 'start',
+                                            formatter: 'Max'
+                                        },
+                                        type: 'max',
+                                        name: '最高点'
+                                    }
+                                ]
+                            ]
+                        }
+                    }
+                ]
+            });
+        },
+        url : "/weather/info/太原/7",
+        type : "get"
+    })
+
+    //这里的#btn1为id选择器即id名为btn1的元素，
+    $("#btn1").click(function(){
+        var innerText = $("#in1").val()
+        var innerText1 = $("#in2").val()
+        xdata = []
+        minData = []
+        maxData = []
+        $.ajax({
+            asycn : true,
+            contentType : "application/json",
+            dataType : "json",
+            error : function() {
+                // 出现错误
+                alert("请求错误");
+            },
+            success : function(result) {
+                // data 就是responseText返回的数据,但是这里是jQuery处理完成之后的数据
+                let list = result.list;
+                let sum=0
+                for (let i = 0;i < list.length;sum++,i++){
+                    xdata.push(list[i].dateTime)
+                    minData.push(list[i].min)
+                    maxData.push(list[i].max)
+                }
+
+                myChart.setOption({ //加载数据图表
+                    title: {
+                        text: list[0].address + sum +'日温度变化'
+                    },
+                    xAxis: {
+                        type: 'category',
+                        boundaryGap: false,
+                        data: xdata
+                    },
+                    series: [
+                        {
+                            name: '最高温度',
+                            type: 'line',
+                            data: maxData,
+                            markPoint: {
+                                data: [
+                                    { type: 'max', name: 'Max' },
+                                    { type: 'min', name: 'Min' }
+                                ]
+                            },
+                            markLine: {
+                                data: [{ type: 'average', name: 'Avg' }]
+                            }
+                        },
+                        {
+                            name: '最低温度',
+                            type: 'line',
+                            data: minData,
+                            markPoint: {
+                                data: [{ name: '周最低', value: -2, xAxis: 1, yAxis: -1.5 }]
+                            },
+                            markLine: {
+                                data: [
+                                    { type: 'average', name: 'Avg' },
+                                    [
+                                        {
+                                            symbol: 'none',
+                                            x: '90%',
+                                            yAxis: 'max'
+                                        },
+                                        {
+                                            symbol: 'circle',
+                                            label: {
+                                                position: 'start',
+                                                formatter: 'Max'
+                                            },
+                                            type: 'max',
+                                            name: '最高点'
+                                        }
+                                    ]
+                                ]
+                            }
+                        }
+                    ]
+
+                });
+            },
+            url : "/weather/info/"+innerText+"/"+innerText1,
+            type : "get"
+        })
+    })
+
+    $("#btn2").click(function(){
+        let innerText = $("#in3").val()
+
+        $.ajax({
+            asycn : true,
+            contentType : "application/json",
+            dataType : "json",
+            error : function() {
+                // 出现错误
+                alert("请求错误");
+            },
+            success : function(result) {
+                // data 就是responseText返回的数据,但是这里是jQuery处理完成之后的数据
+                layer.open({
+                    title: '结果'
+                    ,content: '查询成功'+result.data
+                });
+                console.log(result.data)
+            },
+            url : "/weather/search/"+innerText,
+            type : "get"
+        })
+    })
+</script>
+</body>
+</html>

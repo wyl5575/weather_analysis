@@ -26,7 +26,6 @@ src/test
 .idea
 .mvn
 target
-LICENSE
 mvnw
 mvnw.cmd
 weather_analysis.iml
